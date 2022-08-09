@@ -1,0 +1,3 @@
+[submodule "src/libQBD"]
+	path = src/libQBD
+	url = https://github.com/ProgGrey/libQBD
