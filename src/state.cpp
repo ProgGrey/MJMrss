@@ -121,8 +121,13 @@ state::operator std::string() const
 {
     stringstream ret;
     ret << (unsigned int)m << '|';
-    for(unsigned int k =0; k < this->s_len; k++){
-        ret << (unsigned int)s[k] << ',';
+    if(this->s_len > 0){
+        for(unsigned int k = 0; k < (this->s_len - 1); k++){
+            ret << (unsigned int)s[k] << ',';
+        }
+        ret << (unsigned int)s[this->s_len - 1];
+    } else{
+        ret << (unsigned int)s[this->s_len];
     }
     return ret.str();
 }

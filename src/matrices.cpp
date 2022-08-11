@@ -31,20 +31,6 @@ inline unsigned int find_index(const state &what, const vector<state> &where)
 MatrixXd create_forward_matrix(const vector<state> &from, const vector<state> &to, double lambda, const MatrixXd &P_a, const server_dist &dist, uint16_t level)
 {
     uint16_t mode_count = P_a.rows();
-    //vector<state> from = generate_all_states(mode_count, c, level, dist);
-    /*
-    cout << "from:" << endl;
-    for(auto it = from.begin(); it != from.end(); it++){
-        cout << (string)*it << endl;
-    }
-    //*/
-    //vector<state> to = generate_all_states(mode_count, c, level + 1, dist);
-    /*
-    cout << "to:" << endl;
-    for(auto it = to.begin(); it != to.end(); it++){
-        cout << (string)*it << endl;
-    }
-    //*/
     MatrixXd A_plus = MatrixXd::Constant(from.size(), to.size(), 0.0);
     for(auto it = from.begin(); it != from.end(); it++){
         unsigned int fr = it - from.begin();
@@ -60,12 +46,10 @@ MatrixXd create_forward_matrix(const vector<state> &from, const vector<state> &t
                 if(P_a(it->m, j) != 0.0){
                     what.m = j;
                     A_plus(fr, find_index(what, to)) += P_a(it->m, j) * dist.prob[k] * lambda;
-                    //A_plus(fr, find_index(what, to)) += 0;
                 }
             }
         }
     }
-    //cout << A_plus.rowwise().sum() << endl;
     return A_plus;
 }
 
@@ -78,7 +62,6 @@ void review_all_arrivals(const state &what, const server_dist &state_dist, const
             state copy(what);
             copy.s[state_dist.serv_count[k] - 1]++;
             if(copy.busy() <= c){
-                //cout << rate * state_dist.prob[k] << endl;
                 review_all_arrivals(copy, orig_dist, orig_dist, rate * state_dist.prob[k], level, c, fr, to, A_minus);
             }else{
                 A_minus(fr, find_index(what, to)) += rate * state_dist.prob[k];
@@ -91,13 +74,6 @@ void review_all_arrivals(const state &what, const server_dist &state_dist, const
 MatrixXd create_backward_matrix(const vector<state> &from, const vector<state> &to, const MatrixXd &P_d, const vector<double> &velocity, const vector<server_dist> &dists, uint16_t level, uint16_t c)
 {
     uint16_t mode_count = P_d.rows();
-    //vector<state> from = generate_all_states(mode_count, c, level, dists.front());
-    /*
-    for(auto it = from.begin(); it != from.end(); it++){
-        cout << (string)*it << endl;
-    }
-    //*/
-    //vector<state> to = generate_all_states(mode_count, c, level - 1, dists.front());
     MatrixXd A_minus = MatrixXd::Constant(from.size(), to.size(), 0.0);
     // For all states
     for(auto it = from.begin(); it != from.end(); it++){
@@ -112,17 +88,12 @@ MatrixXd create_backward_matrix(const vector<state> &from, const vector<state> &
                         state what = *it;
                         what.s[j]--;
                         what.m = k;
-                        //double rate = P_d(it->m, k) * it->s[j]/it->apps();//*it->s[j]*dists.front().get_mu(j+1);
                         double rate = P_d(it->m, k) * it->s[j] * dists.front().get_mu(j+1) * velocity[it->m];
-                        //cout << rate << endl;
-                        //cout << j << '\t' << dists.front().get_mu(j+1) << endl;// '\t' <<  rate << endl;
                         review_all_arrivals(what, state_dist, dists.front(), rate, level - 1, c, fr, to, A_minus);
                     }
                 }
             }
         }
     }
-    //cout<< A_minus.rowwise().sum() << endl;
-    //cout<< A_minus << endl;
     return A_minus;
 }

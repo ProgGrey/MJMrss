@@ -1,21 +1,19 @@
 Package: MJMrss
 Type: Package
 Title: Multiserver job model with random speed scaling.
-Version: 0.1
+Version: 0.9
 URL: https://github.com/ProgGrey/MJMrss
 BugReports: https://github.com/ProgGrey/MJMrss/issues
+Date: 2022-08-11
 Authors@R: 
     c(person(given = "Sergey",
            family = "Astafiev",
            role = c("aut", "cre"),
            email = "seryymail@mail.ru",
-           comment = c(ORCID = "https://orcid.org/0000-0002-4486-798X"))))
-Description: Numerical solution of multiserver job model with random speed scaling policy
-Imports: Rcpp
-LinkingTo: Rcpp(>= 1.0.9)
-Depends: R (>= 4.0.3)
+           comment = c(ORCID = "https://orcid.org/0000-0002-4486-798X")))
+Description: Numerical solution of multiserver job model with random speed scaling policy.
 License: BSD_3_clause + file LICENSE
 Encoding: UTF-8
-LazyData: true
-Roxygen: list(markdown = TRUE)
+Imports: methods, Rcpp (>= 1.0.9), RcppEigen
+LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 7.2.1
