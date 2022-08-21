@@ -4,16 +4,14 @@
 \alias{build_model}
 \title{build_model}
 \usage{
-build_model(lambda, N, mu, p_i, f, P_a, P_d)
+build_model(lambda, N, class_desc, f, P_a, P_d)
 }
 \arguments{
 \item{lambda}{Input rate.}
 
 \item{N}{Number of servers.}
 
-\item{mu}{Job size for each class.}
-
-\item{p_i}{Discrete distribution of server count required by client.}
+\item{class_desc}{Description for clients class, i.e. matrix where first row is server count, second row is probability, last row is mu.}
 
 \item{f}{Speed in each modes.}
 

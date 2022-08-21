@@ -4,6 +4,9 @@
  *
  * This source code is licensed under the BSD-3 clause license.
  */
+#pragma GCC optimize("fp-contract=fast")
+#pragma STDC FP_CONTRACT FAST
+
 #include "libQBD/inc/libQBD.hpp"
 #include <iostream>
 #include <stdint.h>
@@ -86,21 +89,21 @@ class Model
         this->init(lambda, c, dist, f, P_a, P_d);
     }
 
-    Model(double lambda, unsigned int c, const NumericVector &mu, const NumericVector &clients_server_distribution, vector<double> f, MatrixXd P_a, MatrixXd P_d)
+    Model(double lambda, unsigned int c, const NumericMatrix &classes, vector<double> f, MatrixXd P_a, MatrixXd P_d)
     {
         unsigned int len = 0;
-        for(auto it = clients_server_distribution.begin(); it != clients_server_distribution.end(); it++){
-            if(*it != 0.0){
+        for(unsigned int k = 0; k < classes.cols(); k++){
+            if(classes(1,k) != 0.0){
                 len++;
             }
         }
         server_dist dist(len);
         unsigned int pos = 0;
-        for(unsigned int k = 0; k < clients_server_distribution.size(); k++){
-            if(clients_server_distribution[k] != 0.0){
-                dist.mu[pos] = mu[k];
-                dist.prob[pos] = clients_server_distribution[k];
-                dist.serv_count[pos] = k + 1;
+        for(unsigned int k = 0; k < classes.cols(); k++){
+            if(classes(1,k) != 0.0){
+                dist.mu[pos] = classes(2,k);
+                dist.prob[pos] = classes(1,k);
+                dist.serv_count[pos] = classes(0,k);
                 pos++;
             }
         }
@@ -204,7 +207,7 @@ RCPP_MODULE(master){
     class_<Model>( "Model" )
 
     .constructor()
-    .constructor<double, unsigned int, const NumericVector&, const NumericVector&, vector<double>, MatrixXd, MatrixXd>()
+    .constructor<double, unsigned int, const NumericMatrix &, vector<double>, MatrixXd, MatrixXd>()
 
     .property("rho", &Model::get_rho)
     .property("mean_clients", &Model::get_mean_clients)

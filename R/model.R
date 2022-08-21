@@ -12,18 +12,16 @@
 #' @description Built multiserver job model with random speed scaling
 #' @param lambda Input rate.
 #' @param N Number of servers.
-#' @param mu Job size for each class.
-#' @param p_i Discrete distribution of server count required by client.
+#' @param class_desc Description for clients class, i.e. matrix where first row is server count, second row is probability, last row is mu.
 #' @param f Speed in each modes.
 #' @param P_a Mode switching stochastic matrix when arrivals.
 #' @param P_d Mode switching stochastic matrix when departures.
 #' @return Class that describes model.
-build_model = function(lambda, N, mu, p_i, f, P_a, P_d)
+build_model = function(lambda, N, class_desc, f, P_a, P_d)
 {
-
     if((nrow(P_a) == nrow(P_d)) && (nrow(P_a) == ncol(P_a)) && (nrow(P_a) == ncol(P_d))){
-        if(length(mu) != length(p_i)){
-            stop("Length of mu and p_i must be equal.")
+        if((nrow(class_desc) != 3 ) || (ncol(class_desc) < 1)){
+            stop("class_desc must be matrix with 3 rows and at least 1 column.")
         }
         if((length(lambda) > 1) || (length(N) > 1)){
             stop("lambda and N must be scalars.")
@@ -32,12 +30,21 @@ build_model = function(lambda, N, mu, p_i, f, P_a, P_d)
             stop("Number of velocitites must be equal number of modes.")
         }
         if(N < 1){
-            stop("c must be positive integer.")
+            stop("N must be positive integer.")
         }
         if(lambda <= 0){
             stop("Input rate must be greater than zero.")
         }
-        return(new(Model, lambda, N, mu, p_i, f, P_a, P_d))
+        if(min(class_desc[1,]) < 1){
+            stop("Server count must be positive integer.")
+        }
+        if((min(class_desc[2,]) < 0) || (max(class_desc[2,]) > 1)){
+            stop("Second row contains probabilities.")
+        }
+        if(min(class_desc[3,]) < 0){
+            stop("mu is a rate and must be greater than zero.")
+        }
+        return(new(Model, lambda, N, class_desc, f, P_a, P_d))
     } else {
         stop("P_a and P_d must be equal size square matrix.")
     }
