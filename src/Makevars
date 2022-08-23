@@ -1,0 +1,2 @@
+PKG_CXXFLAGS=-ffp-contract=fast -fopenmp -flto -O2
+PKG_LIBS=-ffp-contract=fast -fopenmp -fuse-linker-plugin -flto -O2

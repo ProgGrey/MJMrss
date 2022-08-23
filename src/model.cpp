@@ -4,9 +4,6 @@
  *
  * This source code is licensed under the BSD-3 clause license.
  */
-#pragma GCC optimize("fp-contract=fast")
-#pragma STDC FP_CONTRACT FAST
-
 #include "libQBD/inc/libQBD.hpp"
 #include <iostream>
 #include <stdint.h>
@@ -17,14 +14,11 @@
 
 #include <RcppEigen.h>
 
-// [[Rcpp::depends(RcppEigen)]]
-
-/*
-useDynLib(MJMrss, .registration=TRUE)
-import(methods, Rcpp, RcppEigen)
-exportPattern("^[[:alpha:]]+")
-//*/
-//////' @exportPattern "^[[:alpha:]]+"
+#if defined(_OPENMP)
+//#include <omp.h>
+#include <thread>
+#include <cpuid.h>
+#endif
 
 using namespace libQBD;
 using namespace Eigen;
@@ -44,6 +38,16 @@ class Model
 
     void init(double lambda, unsigned int c, const server_dist &dist, const vector<double> &f, const MatrixXd &P_a, const MatrixXd &P_d)
     {
+        // Initialize OpenMP
+        #if defined(_OPENMP)
+        unsigned int eax, ebx, ecx, edx;
+        __get_cpuid(1, &eax, &ebx, &ecx, &edx);
+        bool hyper_th =  (edx & (1 << 28)) > 0;
+        unsigned int cores_log = thread::hardware_concurrency();
+        unsigned int cores_ph = hyper_th ? cores_log >> 1 : cores_log;
+        Eigen::setNbThreads(cores_ph);
+        #endif
+        // Initilize model
         this->c = c;
         // Prepare states descriptions:
         for(unsigned int k = 0; k <= (c + 1); k++){
