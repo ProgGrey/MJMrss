@@ -122,7 +122,7 @@ state::operator std::string() const
     stringstream ret;
     ret << (unsigned int)m << '|';
     if(this->s_len > 0){
-        for(unsigned int k = 0; k < (this->s_len - 1); k++){
+        for(unsigned int k = 0; k < static_cast<unsigned int>(this->s_len - 1); k++){
             ret << (unsigned int)s[k] << ',';
         }
         ret << (unsigned int)s[this->s_len - 1];

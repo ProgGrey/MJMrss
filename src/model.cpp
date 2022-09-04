@@ -27,6 +27,60 @@ using namespace Rcpp;
 
 using Eigen::VectorXd;
 
+class ModelTransient
+{
+    private:
+    TaylorSeriesTransient<double> td;
+    
+    std::vector<Eigen::VectorX<double>> *queue_size_vector;
+    vector<VectorX<double>> pi_0;
+
+    vector<VectorX<double>> &cast_pi0(const Rcpp::List &pi_0)
+    {
+        this->pi_0.clear();
+        for(auto it = pi_0.begin(); it != pi_0.end(); it++){
+            this->pi_0.push_back(*it);
+        }
+        return this->pi_0;
+    }
+
+    public:
+    ModelTransient(const QBD<double> &proc, uint8_t order, double step, std::vector<Eigen::VectorX<double>> *q)
+    {
+        this->queue_size_vector = q;
+        td.bind(proc, order, step);
+    }
+
+    double h()
+    {
+        return td.get_step();
+    }
+    
+    vector<double> get_mean_clients(double max_time, const Rcpp::List &pi_0)
+    {
+        return td.get_mean_clients(max_time, cast_pi0(pi_0));
+    }
+
+    vector<double> get_mean_queue(double max_time, const Rcpp::List &pi_0)
+    {
+        return td.get_mean_queue(*queue_size_vector, max_time, cast_pi0(pi_0));
+    }
+
+    Rcpp::List get_distribution(double max_time, const Rcpp::List &pi_0)
+    {
+        Rcpp::List ret;
+        vector<vector<VectorX<double>>> tmp = td.get_dist(max_time, cast_pi0(pi_0));
+        for(auto it = tmp.begin(); it != tmp.end(); it++){
+            Rcpp::List dft;
+            for(auto itt = it->begin(); itt != it->end(); it++){
+                dft.push_back(*it);
+            }
+            ret.push_back(dft);
+        }
+        return ret;
+    }
+};
+
 class Model
 {
     private:
@@ -39,10 +93,14 @@ class Model
     void init(double lambda, unsigned int c, const server_dist &dist, const vector<double> &f, const MatrixXd &P_a, const MatrixXd &P_d)
     {
         // Initialize OpenMP
-        #if defined(_OPENMP)
+        #ifdef _OPENMP
+        #if defined(__x86_64__) || defined(__i686__)
         unsigned int eax, ebx, ecx, edx;
         __get_cpuid(1, &eax, &ebx, &ecx, &edx);
         bool hyper_th =  (edx & (1 << 28)) > 0;
+        #else
+        bool hyper_th = false;
+        #endif
         unsigned int cores_log = thread::hardware_concurrency();
         unsigned int cores_ph = hyper_th ? cores_log >> 1 : cores_log;
         Eigen::setNbThreads(cores_ph);
@@ -64,8 +122,24 @@ class Model
         sd.bind(process);
     }
 
+    bool is_queue_size_vector_comp = false;
+    std::vector<Eigen::VectorX<double>> queue_size_vector;
     bool is_mean_queue_comp = false;
     double mean_queue;
+    void computate_queue_size_vec(void)
+    {
+        if(is_queue_size_vector_comp != true){
+            for(unsigned int k = 0; k <= c; k++){
+                Eigen::VectorX<double> v = Eigen::VectorX<double>::Constant(states[k].size(), 1, 0);
+                for(auto it = states[k].begin(); it != states[k].end(); it++)
+                {
+                    v(it-states[k].begin(), 0) = k - it->apps();
+                }
+                queue_size_vector.push_back(v);
+            }
+            is_queue_size_vector_comp = true;
+        }
+    }
 
     bool is_pi_0_c_comp = false;
     Rcpp::List pi_0_c;
@@ -96,14 +170,14 @@ class Model
     Model(double lambda, unsigned int c, const NumericMatrix &classes, vector<double> f, MatrixXd P_a, MatrixXd P_d)
     {
         unsigned int len = 0;
-        for(unsigned int k = 0; k < classes.cols(); k++){
+        for(int k = 0; k < classes.cols(); k++){
             if(classes(1,k) != 0.0){
                 len++;
             }
         }
         server_dist dist(len);
         unsigned int pos = 0;
-        for(unsigned int k = 0; k < classes.cols(); k++){
+        for(int k = 0; k < classes.cols(); k++){
             if(classes(1,k) != 0.0){
                 dist.mu[pos] = classes(2,k);
                 dist.prob[pos] = classes(1,k);
@@ -144,15 +218,7 @@ class Model
     double get_mean_queue()
     {
         if(!is_mean_queue_comp){
-            std::vector<Eigen::VectorX<double>> queue_size_vector;
-            for(unsigned int k = 0; k <= c; k++){
-                Eigen::VectorX<double> v = Eigen::VectorX<double>::Constant(states[k].size(), 1, 0);
-                for(auto it = states[k].begin(); it != states[k].end(); it++)
-                {
-                    v(it-states[k].begin(), 0) = k - it->apps();
-                }
-                queue_size_vector.push_back(v);
-            }
+            computate_queue_size_vec();
             mean_queue = sd.get_mean_queue(queue_size_vector);
             is_mean_queue_comp = true;
         }
@@ -185,6 +251,23 @@ class Model
         }
         return ret;
     }
+    
+    Rcpp::NumericVector level_serviced_clients(unsigned int level)
+    {
+        Rcpp::NumericVector ret;
+        if(level >= states.size()){
+            //ret.reserve(states.back().size());
+            for(auto it = states.back().begin(); it != states.back().end(); it++){
+                ret.push_back(it->apps());
+            }
+        } else{
+            //ret.reserve(states[level].size());
+            for(auto it = states[level].begin(); it != states[level].end(); it++){
+                ret.push_back(it->apps());
+            }
+        }
+        return ret;
+    }
 
     Rcpp::StringVector level_description(unsigned int level)
     {
@@ -202,11 +285,27 @@ class Model
         }
         return ret;
     }
+
+    ModelTransient transient_analysis(uint8_t order, double step)
+    {
+        return ModelTransient(this->process, order, step, &queue_size_vector);
+    }
 };
 
+RCPP_EXPOSED_CLASS(ModelTransient)
+RCPP_EXPOSED_CLASS(Model)
 
 RCPP_MODULE(master){
     using namespace Rcpp ;
+
+    class_<ModelTransient>("ModelTransient")
+
+    .property("h", &ModelTransient::h)
+
+    .method("mean_clients", &ModelTransient::get_mean_clients)
+    .method("mean_queue", &ModelTransient::get_mean_queue)
+    .method("distribution", &ModelTransient::get_distribution)
+    ;
 
     class_<Model>( "Model" )
 
@@ -222,5 +321,7 @@ RCPP_MODULE(master){
     .method("distribution", &Model::get_distribution)
     .method("level_description", &Model::level_description)
     .method("level_busy_servers", &Model::level_busy_servers)
+    .method("level_serviced_clients", &Model::level_serviced_clients)
+    .method("transient_analysis", &Model::transient_analysis)
     ;
 }
