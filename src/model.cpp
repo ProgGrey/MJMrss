@@ -27,6 +27,28 @@ using namespace Rcpp;
 
 using Eigen::VectorXd;
 
+//' @name ModelTransient
+//' @title MJMrss model representation for transient analysis
+//' @description Internal representation for multi-server job model with random speed scaling for transient analysis.
+//' @field h - Returns current step size.
+//' @field mean_clients.
+//' \itemize{
+//' \item Parameter: max_time - maximum time for which you want to calculate mean customers in system;
+//' \item Parameter: pi_0 - list of vectors contains distribution at zero time.
+//' \item Returns: mean clients in system.
+//' }
+//' @field mean_queue
+//' \itemize{
+//' \item Parameter: max_time - maximum time for which you want to calculate mean queue length;
+//' \item Parameter: pi_0 - list of vectors contains distribution at zero time.
+//' \item Returns: mean queue length
+//' }
+//' @field distribution 
+//' \itemize{
+//' \item Parameter: max_time - maximum level for which you want to calculate distribution;
+//' \item Parameter: pi_0 - list of vectors contains distribution at zero time.
+//' \item Returns: list of lists of vectors containing transient distribution.
+//' }
 class ModelTransient
 {
     private:
@@ -81,6 +103,43 @@ class ModelTransient
     }
 };
 
+
+//' @name Model
+//' @title MJMrss model representation
+//' @description Internal representation for multi-server job model with random speed scaling.
+//' @field rho Returns rho computated by using Neuts ergodicity criteria.
+//' @field mean_clients Returns mean clients in system.
+//' @field mean_queue Returns mean queue length.
+//' @field sum_pi_from_c_to_inf Returns sum of distribution vectors from level N to infinity level.
+//' @field pi_0_c Returns distribution for first N levels.
+//' @field distribution 
+//' \itemize{
+//' \item Parameter: max_level - maximum level for which you want to calculate distribution;
+//' \item Returns: list of vectors containing stationary distribution.
+//' }
+//' @field level_description 
+//' \itemize{
+//' \item Parameter: level -  level for which you want to get a description;
+//' \item Returns: human-readable description of level in form "m|s_1,s_2,..." where "m" is a speed mode and "s_i" is
+//' a number of serviced customers of "i" class.
+//' }
+//' @field level_busy_servers 
+//' \itemize{
+//' \item Parameter: level -  level for which you want to get a description;
+//' \item Returns: vector of numbers of busy servers for each state at specified level.
+//' }
+//' @field level_serviced_clients 
+//' \itemize{
+//' \item Parameter: level -  level for which you want to get a description;
+//' \item Returns: vector of numbers of serviced servers for each state at specified level.
+//' }
+//' @field transient_analysis 
+//' \itemize{
+//' \item Parameter: order - numerical order of Taylor series method
+//' \item Parameter: stepsize - If positive, then  step length of the algorithm. If negative - the multiplier of the 
+//' maximum step of the algorithm.
+//' \item Returns: internal representation for model transient analysis (ModelTransient class).
+//' }
 class Model
 {
     private:
@@ -302,9 +361,9 @@ RCPP_MODULE(master){
 
     .property("h", &ModelTransient::h)
 
-    .method("mean_clients", &ModelTransient::get_mean_clients)
-    .method("mean_queue", &ModelTransient::get_mean_queue)
-    .method("distribution", &ModelTransient::get_distribution)
+    .method("mean_clients", &ModelTransient::get_mean_clients, "")
+    .method("mean_queue", &ModelTransient::get_mean_queue, "")
+    .method("distribution", &ModelTransient::get_distribution, "Returns distribution from 0 level to level ")
     ;
 
     class_<Model>( "Model" )
@@ -312,11 +371,11 @@ RCPP_MODULE(master){
     .constructor()
     .constructor<double, unsigned int, const NumericMatrix &, vector<double>, MatrixXd, MatrixXd>()
 
-    .property("rho", &Model::get_rho)
-    .property("mean_clients", &Model::get_mean_clients)
-    .property("mean_queue", &Model::get_mean_queue)
-    .property("sum_pi_from_c_to_inf", &Model::dist_sum_from_c_to_inf)
-    .property("pi_0_c", &Model::get_pi_0_c)
+    .property("rho", &Model::get_rho, "Returns rho computated by using Neuts ergodicity criteria.")
+    .property("mean_clients", &Model::get_mean_clients, "Returns mean clients in system.")
+    .property("mean_queue", &Model::get_mean_queue, "Returns mean queue length.")
+    .property("sum_pi_from_c_to_inf", &Model::dist_sum_from_c_to_inf, "Returns sum of distribution vectors from level N to infinity level.")
+    .property("pi_0_c", &Model::get_pi_0_c, "Returns distribution for first N levels.")
 
     .method("distribution", &Model::get_distribution)
     .method("level_description", &Model::level_description)
