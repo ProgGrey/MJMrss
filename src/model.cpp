@@ -396,7 +396,7 @@ RCPP_MODULE(master){
     class_<Model>( "Model" )
 
     .constructor()
-    .constructor<double, unsigned int, const NumericMatrix &, vector<double>, MatrixXd, MatrixXd>()
+    .constructor<double, unsigned int, NumericMatrix, vector<double>, MatrixXd, MatrixXd>()
 
     .property("rho", &Model::get_rho, "Returns rho computated by using Neuts ergodicity criteria.")
     .property("mean_clients", &Model::get_mean_clients, "Returns mean clients in system.")
