@@ -1,0 +1,5 @@
+^src/libQBD/tests$
+^src/libQBD/Makefile$
+^src/libQBD/\.git$
+^\.vscode$
+^aclocal.m4$
