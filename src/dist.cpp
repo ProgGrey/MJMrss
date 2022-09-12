@@ -5,7 +5,7 @@
  * This source code is licensed under the BSD-3 clause license.
  */
 
-#include "dist.hpp"
+#include "dist.h"
 
 #include <cstring>
 #include <sstream>

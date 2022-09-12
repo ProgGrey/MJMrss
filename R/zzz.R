@@ -11,6 +11,6 @@
 ## a load action, so this does not have to be placed in .onLoad() or evalqOnLoad().
 
 #' @useDynLib MJMrss, .registration = TRUE
-#' @import methods Rcpp RcppEigen
+#' @import methods Rcpp
 #' @exportPattern "^[[:alpha:]]+"
 loadModule("master", TRUE)

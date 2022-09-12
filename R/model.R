@@ -17,6 +17,25 @@
 #' @param P_a Mode switching stochastic matrix when arrivals.
 #' @param P_d Mode switching stochastic matrix when departures.
 #' @return Class that describes model.
+#' @examples
+#' library(MJMrss)
+#' lambda = 10 # Input rate
+#' N = 10 # Number of servers
+#' f = c(1, 2.2) # Speed (frequency)
+#' P_a = matrix(c(0.1, 0.9,
+#'                0.0, 1.0), nrow = 2, byrow = TRUE)
+#' P_d = matrix(c(1.0, 0.0,
+#'                0.2, 0.8), nrow = 2, byrow = TRUE)
+#' classes = matrix(c(1,      2,    3,   4,# j  
+#'                    0.5, 0.25, 0.15, 0.1,# p_j
+#'                    1,    1.9,  2.5, 3), # mu_j
+#'                    nrow = 3, byrow = TRUE)
+#' m = build_model(lambda, N, classes, f, P_a, P_d)
+#' # mean customers in system and mean queue length:
+#' m$mean_clients
+#' m$mean_queue
+#' # Distribution from level 0 to level 20:
+#' dist = m$distribution(20)
 build_model = function(lambda, N, class_desc, f, P_a, P_d)
 {
     if((nrow(P_a) == nrow(P_d)) && (nrow(P_a) == ncol(P_a)) && (nrow(P_a) == ncol(P_d))){

@@ -3,7 +3,6 @@
 export(build_model)
 exportPattern("^[[:alpha:]]+")
 import(Rcpp)
-import(RcppEigen)
 import(methods)
 importFrom(methods,new)
 useDynLib(MJMrss, .registration = TRUE)

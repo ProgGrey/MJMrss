@@ -4,11 +4,21 @@
  *
  * This source code is licensed under the BSD-3 clause license.
  */
-#include "libQBD/inc/libQBD.hpp"
+//#include <Eigen/Dense>
+
 #include <iostream>
 #include <stdint.h>
 
-#include "main.hpp"
+#include <Eigen/Dense>
+#if (EIGEN_WORLD_VERSION == 3) && (EIGEN_MAJOR_VERSION == 3)
+namespace Eigen{
+    template <typename Type>
+    using VectorX = Matrix<Type, Dynamic, 1>;
+};
+#endif
+#include "libQBD/inc/libQBD.hpp"
+
+#include "main.h"
 
 #include <Rcpp.h>
 
@@ -25,10 +35,13 @@ using namespace Eigen;
 using namespace std;
 using namespace Rcpp;
 
-using Eigen::VectorXd;
+//using Eigen::VectorXd;
 
-//' @name ModelTransient
-//' @title MJMrss model representation for transient analysis
+//' @name Rcpp_ModelTransient
+//' @aliases ModelTransient
+//' @aliases Rcpp_ModelTransient-class
+//' @rdname ModelTransient-class
+//' @title ModelTransient Class
 //' @description Internal representation for multi-server job model with random speed scaling for transient analysis.
 //' @field h - Returns current step size.
 //' @field mean_clients.
@@ -103,9 +116,11 @@ class ModelTransient
     }
 };
 
-
-//' @name Model
-//' @title MJMrss model representation
+//' @name Rcpp_Model
+//' @aliases Model
+//' @aliases Rcpp_Model-class
+//' @rdname Model-class
+//' @title Model Class
 //' @description Internal representation for multi-server job model with random speed scaling.
 //' @field rho Returns rho computated by using Neuts ergodicity criteria.
 //' @field mean_clients Returns mean clients in system.
@@ -212,10 +227,20 @@ class Model
         f.push_back(1.0);
         f.push_back(2.2);
 
-        MatrixXd P_a{{0.8, 0.2},
-                    {0.0, 1.0}};
-        MatrixXd P_d{{1.0, 0.0},
-                    {0.2, 0.8}};
+        MatrixXd P_a = MatrixXd(2,2);
+        //{{0.8, 0.2},
+        //{0.0, 1.0}};
+        P_a(0,0) = 0.8;
+        P_a(0,1) = 0.2;
+        P_a(1,0) = 0;
+        P_a(1,1) = 1;
+        MatrixXd P_d = MatrixXd(2,2);
+        //{{1.0, 0.0},
+        // {0.2, 0.8}};
+        P_d(0,0) = 1;
+        P_d(0,1) = 0;
+        P_d(1,0) = 0.2;
+        P_d(1,1) = 0.8;
 
         server_dist dist(c);
         for(unsigned int k = 0; k < c; k++){
@@ -223,10 +248,12 @@ class Model
             dist.serv_count[k] = k + 1;
             dist.mu[k] = (double)(k + 1);
         }
+        
         this->init(lambda, c, dist, f, P_a, P_d);
+        //*/
     }
 
-    Model(double lambda, unsigned int c, const NumericMatrix &classes, vector<double> f, MatrixXd P_a, MatrixXd P_d)
+    Model(double lambda, unsigned int c, NumericMatrix classes, vector<double> f, MatrixXd P_a, MatrixXd P_d)
     {
         unsigned int len = 0;
         for(int k = 0; k < classes.cols(); k++){
@@ -361,9 +388,9 @@ RCPP_MODULE(master){
 
     .property("h", &ModelTransient::h)
 
-    .method("mean_clients", &ModelTransient::get_mean_clients, "")
-    .method("mean_queue", &ModelTransient::get_mean_queue, "")
-    .method("distribution", &ModelTransient::get_distribution, "Returns distribution from 0 level to level ")
+    .method("mean_clients", &ModelTransient::get_mean_clients)
+    .method("mean_queue", &ModelTransient::get_mean_queue)
+    .method("distribution", &ModelTransient::get_distribution)
     ;
 
     class_<Model>( "Model" )

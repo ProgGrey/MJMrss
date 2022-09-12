@@ -4,7 +4,7 @@
  *
  * This source code is licensed under the BSD-3 clause license.
  */
-#include "state.hpp"
+#include "state.h"
 #include <sstream>
 #include <algorithm>
 

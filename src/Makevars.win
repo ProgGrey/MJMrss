@@ -1,2 +1,2 @@
-PKG_CXXFLAGS=-ffp-contract=fast -fopenmp -flto -O2
-PKG_LIBS=-ffp-contract=fast -fopenmp -fuse-linker-plugin -flto -O2
+PKG_CXXFLAGS=-ffp-contract=fast -std=gnu++14 -fopenmp -ffat-lto-objects -flto -O2
+PKG_LIBS=-ffp-contract=fast -fopenmp -O2

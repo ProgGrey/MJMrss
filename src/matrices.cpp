@@ -4,8 +4,8 @@
  *
  * This source code is licensed under the BSD-3 clause license.
  */
-#include "matrices.hpp"
-#include "state.hpp"
+#include "matrices.h"
+#include "state.h"
 
 #include <iostream>
 
