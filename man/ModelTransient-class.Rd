@@ -8,7 +8,7 @@
 \description{
 Internal representation for multi-server job model with random speed scaling for transient analysis.
 }
-\section{Fields}{
+\section{Slots}{
 
 \describe{
 \item{\code{h}}{- Returns current step size.}

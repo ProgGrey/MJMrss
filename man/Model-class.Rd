@@ -8,7 +8,7 @@
 \description{
 Internal representation for multi-server job model with random speed scaling.
 }
-\section{Fields}{
+\section{Slots}{
 
 \describe{
 \item{\code{rho}}{Returns rho computated by using Neuts ergodicity criteria.}
