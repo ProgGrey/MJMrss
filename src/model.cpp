@@ -91,24 +91,24 @@ class ModelTransient
         return td.get_step();
     }
     
-    vector<double> get_mean_clients(double max_time, const Rcpp::List &pi_0)
+    vector<double> get_mean_clients(double max_time, Rcpp::List pi_0)
     {
         return td.get_mean_clients(max_time, cast_pi0(pi_0));
     }
 
-    vector<double> get_mean_queue(double max_time, const Rcpp::List &pi_0)
+    vector<double> get_mean_queue(double max_time, Rcpp::List pi_0)
     {
         return td.get_mean_queue(*queue_size_vector, max_time, cast_pi0(pi_0));
     }
 
-    Rcpp::List get_distribution(double max_time, const Rcpp::List &pi_0)
+    Rcpp::List get_distribution(double max_time, Rcpp::List pi_0)
     {
         Rcpp::List ret;
         vector<vector<VectorX<double>>> tmp = td.get_dist(max_time, cast_pi0(pi_0));
         for(auto it = tmp.begin(); it != tmp.end(); it++){
             Rcpp::List dft;
-            for(auto itt = it->begin(); itt != it->end(); it++){
-                dft.push_back(*it);
+            for(auto itt = it->begin(); itt != it->end(); itt++){
+                dft.push_back(*itt);
             }
             ret.push_back(dft);
         }
