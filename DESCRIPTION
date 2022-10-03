@@ -1,7 +1,7 @@
 Package: MJMrss
 Type: Package
 Title: Multiserver Job Model with Random Speed Scaling
-Version: 1.0.1
+Version: 1.0.2
 URL: https://github.com/ProgGrey/MJMrss
 BugReports: https://github.com/ProgGrey/MJMrss/issues
 Date: 2022-09-08

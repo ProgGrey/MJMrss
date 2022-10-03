@@ -199,7 +199,7 @@ class Model
     bool is_queue_size_vector_comp = false;
     std::vector<Eigen::VectorX<double>> queue_size_vector;
     bool is_mean_queue_comp = false;
-    double mean_queue;
+    double mean_queue = 0;
     void computate_queue_size_vec(void)
     {
         if(is_queue_size_vector_comp != true){
@@ -219,39 +219,6 @@ class Model
     Rcpp::List pi_0_c;
 
     public:
-    Model()
-    {
-        unsigned int c = 10;
-        double lambda = 0.1;
-        vector<double> f;
-        f.push_back(1.0);
-        f.push_back(2.2);
-
-        MatrixXd P_a = MatrixXd(2,2);
-        //{{0.8, 0.2},
-        //{0.0, 1.0}};
-        P_a(0,0) = 0.8;
-        P_a(0,1) = 0.2;
-        P_a(1,0) = 0;
-        P_a(1,1) = 1;
-        MatrixXd P_d = MatrixXd(2,2);
-        //{{1.0, 0.0},
-        // {0.2, 0.8}};
-        P_d(0,0) = 1;
-        P_d(0,1) = 0;
-        P_d(1,0) = 0.2;
-        P_d(1,1) = 0.8;
-
-        server_dist dist(c);
-        for(unsigned int k = 0; k < c; k++){
-            dist.prob[k] = 1.0/c;
-            dist.serv_count[k] = k + 1;
-            dist.mu[k] = (double)(k + 1);
-        }
-        
-        this->init(lambda, c, dist, f, P_a, P_d);
-        //*/
-    }
 
     Model(double lambda, unsigned int c, NumericMatrix classes, vector<double> f, MatrixXd P_a, MatrixXd P_d)
     {
@@ -395,7 +362,6 @@ RCPP_MODULE(master){
 
     class_<Model>( "Model" )
 
-    .constructor()
     .constructor<double, unsigned int, NumericMatrix, vector<double>, MatrixXd, MatrixXd>()
 
     .property("rho", &Model::get_rho, "Returns rho computated by using Neuts ergodicity criteria.")
