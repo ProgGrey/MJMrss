@@ -26,6 +26,58 @@
 #' \item Parameter: pi_0 - list of vectors contains distribution at zero time.
 #' \item Returns: list of lists of vectors containing transient distribution.
 #' }
+#' @examples
+#' # M/M/1 model
+#' lambda = 1.5
+#' mu = 2
+#' t = 80
+#' library(MJMrss)
+#' N = 1 # Number of servers
+#' f = c(mu) # Speed (frequency)
+#' P_a = matrix(c(1), nrow = 1, byrow = TRUE)
+#' P_d = matrix(c(1), nrow = 1, byrow = TRUE)
+#' classes = matrix(c(1,# j  
+#'                    1,# p_j
+#'                    1), # mu_j
+#'                  nrow = 3, byrow = TRUE)
+#' m = build_model(lambda, N, classes, f, P_a, P_d)
+#' trans = m$transient_analysis(10, -1)
+#' # At zero time in system 3 clients:
+#' cl = trans$mean_clients(t, list(c(0),c(0),c(0),c(1)))
+#' plot((1:length(cl)-1)*trans$h, cl)
+#' \dontrun{
+#' library(queueing)
+#' i_mm1 <- NewInput.MM1(lambda, mu)
+#' o_mm1 <- QueueingModel(i_mm1)
+#' L(o_mm1)
+#' }
+NULL
+
+#' @name Rcpp_ModelTransient$distribution
+#' @aliases ModelTransient$distribution
+#' @aliases Rcpp_ModelTransient-class$distribution
+#' @title Transient distribution
+#' @param max_time A maximum time for which you want to calculate mean customers in system;
+#' @param pi_0 A list of vectors contains distribution at zero time.
+#' @return A list of lists of vectors containing transient distribution at times proportional to the step length h.
+NULL
+
+#' @name Rcpp_ModelTransient$mean_queue
+#' @aliases ModelTransient$mean_queue
+#' @aliases Rcpp_ModelTransient-class$mean_queue
+#' @title Mean queue length
+#' @param max_time A maximum time for which you want to calculate mean customers in system;
+#' @param pi_0 A list of vectors contains distribution at zero time.
+#' @return A vector contains mean queue length at times proportional to the step length h.
+NULL
+
+#' @name Rcpp_ModelTransient$mean_clients
+#' @aliases ModelTransient$mean_clients
+#' @aliases Rcpp_ModelTransient-class$mean_clients
+#' @title Mean customers in system
+#' @param max_time A maximum time for which you want to calculate mean customers in system;
+#' @param pi_0 A list of vectors contains distribution at zero time.
+#' @return A vector contains mean clients in system at times proportional to the step length h.
 NULL
 
 #' @name Rcpp_Model
@@ -58,7 +110,7 @@ NULL
 #' @slot level_serviced_clients 
 #' \itemize{
 #' \item Parameter: level -  level for which you want to get a description;
-#' \item Returns: vector of numbers of serviced servers for each state at specified level.
+#' \item Returns: vector of numbers of serviced clients for each state at specified level.
 #' }
 #' @slot transient_analysis 
 #' \itemize{
@@ -67,5 +119,48 @@ NULL
 #' maximum step of the algorithm.
 #' \item Returns: internal representation for model transient analysis (ModelTransient class).
 #' }
+NULL
+
+#' @name Rcpp_Model$transient_analysis
+#' @aliases Model$transient_analysis
+#' @aliases Rcpp_Model-class$transient_analysis
+#' @title Transient analysis
+#' @param order A numerical order of Taylor series method.
+#' @param stepsize If positive, then  step length of the algorithm. If negative - the multiplier of the 
+#' maximum step of the algorithm
+#' @return An internal representation for model transient analysis (ModelTransient class)
+NULL
+
+#' @name Rcpp_Model$level_serviced_clients
+#' @aliases Model$level_serviced_clients
+#' @aliases Rcpp_Model-class$level_serviced_clients
+#' @title Serviced clients
+#' @param level A level for which you want to get a description;
+#' @return A vector of numbers of serviced clients for each state at specified level.
+NULL
+
+#' @name Rcpp_Model$level_busy_servers
+#' @aliases Model$level_busy_servers
+#' @aliases Rcpp_Model-class$level_busy_servers
+#' @title Busy servers for level
+#' @param level A level for which you want to get a description;
+#' @return A vector of numbers of busy servers for each state at specified level.
+NULL
+
+#' @name Rcpp_Model$level_description
+#' @aliases Model$level_description
+#' @aliases Rcpp_Model-class$level_description
+#' @title Human-readeble level description
+#' @param level A level for which you want to get a description;
+#' @return A human-readable description of level in form "m|s_1,s_2,..." where "m" is a speed mode and "s_i" is
+#' a number of serviced customers of "i" class
+NULL
+
+#' @name Rcpp_Model$distribution
+#' @aliases Model$distribution
+#' @aliases Rcpp_Model-class$distribution
+#' @title Calculate stationary distribution
+#' @param max_level A maximum level for which you want to calculate distribution.
+#' @return A list of vectors containing stationary distribution.
 NULL
 

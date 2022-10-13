@@ -32,3 +32,29 @@ Internal representation for multi-server job model with random speed scaling for
 }}
 }}
 
+\examples{
+# M/M/1 model
+lambda = 1.5
+mu = 2
+t = 80
+library(MJMrss)
+N = 1 # Number of servers
+f = c(mu) # Speed (frequency)
+P_a = matrix(c(1), nrow = 1, byrow = TRUE)
+P_d = matrix(c(1), nrow = 1, byrow = TRUE)
+classes = matrix(c(1,# j  
+                   1,# p_j
+                   1), # mu_j
+                 nrow = 3, byrow = TRUE)
+m = build_model(lambda, N, classes, f, P_a, P_d)
+trans = m$transient_analysis(10, -1)
+# At zero time in system 3 clients:
+cl = trans$mean_clients(t, list(c(0),c(0),c(0),c(1)))
+plot((1:length(cl)-1)*trans$h, cl)
+\dontrun{
+library(queueing)
+i_mm1 <- NewInput.MM1(lambda, mu)
+o_mm1 <- QueueingModel(i_mm1)
+L(o_mm1)
+}
+}

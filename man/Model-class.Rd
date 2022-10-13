@@ -39,7 +39,7 @@ a number of serviced customers of "i" class.
 
 \item{\code{level_serviced_clients}}{\itemize{
 \item Parameter: level -  level for which you want to get a description;
-\item Returns: vector of numbers of serviced servers for each state at specified level.
+\item Returns: vector of numbers of serviced clients for each state at specified level.
 }}
 
 \item{\code{transient_analysis}}{\itemize{
