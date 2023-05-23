@@ -10,7 +10,7 @@
 
 #include <vector>
 #include <cstdint>
-#include <Eigen/Dense>
+#include "eigen_wrap.h"
 
 #include "dist.h"
 #include "state.h"

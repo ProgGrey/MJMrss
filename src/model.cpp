@@ -9,13 +9,8 @@
 #include <iostream>
 #include <stdint.h>
 
-#include <Eigen/Dense>
-#if (EIGEN_WORLD_VERSION == 3) && (EIGEN_MAJOR_VERSION == 3)
-namespace Eigen{
-    template <typename Type>
-    using VectorX = Matrix<Type, Dynamic, 1>;
-};
-#endif
+#include "eigen_wrap.h"
+
 #include "libQBD/inc/libQBD.hpp"
 
 #include "main.h"
