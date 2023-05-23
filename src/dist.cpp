@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Sergey Astaf'ev, IAMR Karelian Research Centre of the RAS
+ * Copyright (c) 2022-2023 Sergey Astaf'ev, IAMR Karelian Research Centre of the RAS
  * All rights reserved.
  *
  * This source code is licensed under the BSD-3 clause license.

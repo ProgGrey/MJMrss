@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2022-2023 Sergey Astaf'ev, IAMR Karelian Research Centre of the RAS
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-3 clause license.
+ */
 #define HAVE_EIGEN_IN_SYSTEM 0
 
 #if HAVE_EIGEN_IN_SYSTEM == 1
