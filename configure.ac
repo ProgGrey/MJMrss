@@ -1,4 +1,4 @@
-AC_INIT([MJMrss], 1.0.2)
+AC_INIT([MJMrss], 1.0.3)
 AC_LANG(C++)
 : ${CXXFLAGS=""}
 # Check openmp
