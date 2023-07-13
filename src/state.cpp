@@ -83,7 +83,7 @@ state& state::operator= (const state &right)
 bool operator< (const state &a, const state &b)
 {
     if(a.s_len != b.s_len){
-        throw "Length of states must be equal for comparison.";
+        throw std::out_of_range("Length of states must be equal for comparison.");
     }
 
     if(a.m < b.m){
@@ -103,7 +103,7 @@ bool operator< (const state &a, const state &b)
 bool operator== (const state &a, const state &b)
 {
     if(a.s_len != b.s_len){
-        throw "Length of states must be equal for comparison.";
+        throw std::out_of_range("Length of states must be equal for comparison.");
     }
     if(a.m == b.m){
         for(unsigned int k = 0; k < a.s_len; k++){
@@ -146,10 +146,8 @@ void gen_combs(state prev, const server_dist &dist, uint16_t level, uint16_t max
             // If an application of this size does not fit, 
             // then an application of a larger size will also not fit.
             if(tmp.busy() > max_servers){
-                // Removing impossible states when distribution is truncated on the right.
-                if (dist.max_serv() > dist.serv_count[last]){
-                    ret.push_back(prev);
-                }
+                // Add unfilled state to set.
+                ret.push_back(prev);
                 break;
             }
             gen_combs(tmp, dist, level, max_servers, k, ret);

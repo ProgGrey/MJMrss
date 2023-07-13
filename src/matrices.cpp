@@ -25,7 +25,11 @@ vector<server_dist> prepare_dist(server_dist dist, uint16_t c)
 inline unsigned int find_index(const state &what, const vector<state> &where)
 {
     auto it = lower_bound(where.begin(), where.end(), what);
-    return (unsigned int)(it - where.begin());
+    if(*it == what){
+        return (unsigned int)(it - where.begin());
+    } else{
+        throw std::out_of_range("Internal bug: output state not found.");
+    }
 }
 
 MatrixXd create_forward_matrix(const vector<state> &from, const vector<state> &to, double lambda, const MatrixXd &P_a, const server_dist &dist, uint16_t level)
