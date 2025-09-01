@@ -291,9 +291,9 @@ class Model
         if(is_queue_size_vector_comp != true){
             for(unsigned int k = 0; k <= c; k++){
                 Eigen::VectorX<double> v = Eigen::VectorX<double>::Constant(states[k].size(), 1, 0);
-                for(auto it = states[k].begin(); it != states[k].end(); it++)
+                for(size_t j = 0; j < states[k].size(); j++)
                 {
-                    v(it-states[k].begin(), 0) = k - it->apps();
+                    v(j, 0) = k - states[k][j].apps();
                 }
                 queue_size_vector.push_back(v);
             }
