@@ -109,7 +109,7 @@ using namespace Rcpp;
 class ModelTransient
 {
     private:
-    TaylorSeriesTransient<double> td;
+    TaylorSeriesClassic<double> td;
     
     std::vector<Eigen::VectorX<double>> *queue_size_vector;
     vector<VectorX<double>> pi_0;
@@ -268,13 +268,17 @@ class Model
             states.push_back(generate_all_states(P_d.rows(), c, k, dist));
         }
         auto cutted_dists = prepare_dist(dist,c);
-        process.add_A_plus(create_forward_matrix(states[0], states[1], lambda, P_a, dist, 0));
+        process.add_zero_level(create_forward_matrix(states[0], states[1], lambda, P_a, dist, 0));
+        //process.add_A_plus(create_forward_matrix(states[0], states[1], lambda, P_a, dist, 0));
         for(unsigned int k = 1; k <= c; k++){
-            process.add_A_plus(create_forward_matrix(states[k], states[k+1], lambda, P_a, dist, k));
-            process.add_A_minus(create_backward_matrix(states[k], states[k-1], P_d, f, cutted_dists, k, c));
+            //process.add_A_plus(create_forward_matrix(states[k], states[k+1], lambda, P_a, dist, k));
+            //process.add_A_minus(create_backward_matrix(states[k], states[k-1], P_d, f, cutted_dists, k, c));
+            process.add_level(create_backward_matrix(states[k], states[k-1], P_d, f, cutted_dists, k, c),
+                              create_forward_matrix(states[k], states[k+1], lambda, P_a, dist, k));
         }
-        process.add_A_minus(create_backward_matrix(states[c + 1], states[c], P_d, f, cutted_dists, c + 1, c));
-        process.auto_A_0();
+        //process.add_A_minus(create_backward_matrix(states[c + 1], states[c], P_d, f, cutted_dists, c + 1, c));
+        process.add_final_level(create_backward_matrix(states[c + 1], states[c], P_d, f, cutted_dists, c + 1, c));
+        //process.auto_A_0();
         sd.bind(process);
     }
 
@@ -293,6 +297,9 @@ class Model
                 }
                 queue_size_vector.push_back(v);
             }
+            Eigen::VectorX<double> last_level = Eigen::VectorX<double>::Constant(states.back().size(), 1, 1);
+            last_level += queue_size_vector.back();
+            queue_size_vector.push_back(last_level);
             is_queue_size_vector_comp = true;
         }
     }
