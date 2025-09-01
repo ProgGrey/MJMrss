@@ -40,6 +40,8 @@
 #'                    1,# p_j
 #'                    1), # mu_j
 #'                  nrow = 3, byrow = TRUE)
+#' # use 2 threads for computatuion
+#' set_num_of_threads(2)
 #' m = build_model(lambda, N, classes, f, P_a, P_d)
 #' trans = m$transient_analysis(10, -1)
 #' # At zero time in system 3 clients:
@@ -163,4 +165,14 @@ NULL
 #' @param max_level A maximum level for which you want to calculate distribution.
 #' @return A list of vectors containing stationary distribution.
 NULL
+
+#' @name set_num_of_threads
+#' @export set_num_of_threads
+#' @title set_num_of_threads
+#' @description Set number of threads. Works only if OpenMP is enabled. Max number of threads restricted by your CPU
+#' @param threads OpenMP only: number of threads for computation.
+#' @return TRUE, if OpenMP is enabled, FALSE otherwise.
+set_num_of_threads <- function(threads) {
+    .Call(`_MJMrss_set_num_of_threads`, threads)
+}
 

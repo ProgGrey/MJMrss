@@ -29,6 +29,33 @@ using namespace Eigen;
 using namespace std;
 using namespace Rcpp;
 
+//' @name set_num_of_threads
+//' @export set_num_of_threads
+//' @title set_num_of_threads
+//' @description Set number of threads. Works only if OpenMP is enabled. Max number of threads restricted by your CPU
+//' @param threads OpenMP only: number of threads for computation.
+//' @return TRUE, if OpenMP is enabled, FALSE otherwise.
+// [[Rcpp::export]]
+bool set_num_of_threads(unsigned int threads)
+{
+    // Initialize OpenMP
+    #ifdef _OPENMP
+    #if defined(__x86_64__) || defined(__i686__)
+    unsigned int eax, ebx, ecx, edx;
+    __get_cpuid(1, &eax, &ebx, &ecx, &edx);
+    bool hyper_th =  (edx & (1 << 28)) > 0;
+    #else
+    bool hyper_th = false;
+    #endif
+    unsigned int cores_log = thread::hardware_concurrency();
+    unsigned int cores_ph = hyper_th ? cores_log >> 1 : cores_log;
+    cores_ph = std::min(cores_ph, threads);
+    Eigen::setNbThreads(cores_ph);
+    return true;
+    #endif
+    return false;
+}
+
 //using Eigen::VectorXd;
 
 //' @name Rcpp_ModelTransient
@@ -70,6 +97,8 @@ using namespace Rcpp;
 //'                    1,# p_j
 //'                    1), # mu_j
 //'                  nrow = 3, byrow = TRUE)
+//' # use 2 threads for computatuion
+//' set_num_of_threads(2)
 //' m = build_model(lambda, N, classes, f, P_a, P_d)
 //' trans = m$transient_analysis(10, -1)
 //' # At zero time in system 3 clients:
@@ -248,19 +277,6 @@ class Model
 
     void init(double lambda, unsigned int c, const server_dist &dist, const vector<double> &f, const MatrixXd &P_a, const MatrixXd &P_d)
     {
-        // Initialize OpenMP
-        #ifdef _OPENMP
-        #if defined(__x86_64__) || defined(__i686__)
-        unsigned int eax, ebx, ecx, edx;
-        __get_cpuid(1, &eax, &ebx, &ecx, &edx);
-        bool hyper_th =  (edx & (1 << 28)) > 0;
-        #else
-        bool hyper_th = false;
-        #endif
-        unsigned int cores_log = thread::hardware_concurrency();
-        unsigned int cores_ph = hyper_th ? cores_log >> 1 : cores_log;
-        Eigen::setNbThreads(cores_ph);
-        #endif
         // Initilize model
         this->c = c;
         // Prepare states descriptions:

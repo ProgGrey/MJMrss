@@ -11,10 +11,22 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// set_num_of_threads
+bool set_num_of_threads(unsigned int threads);
+RcppExport SEXP _MJMrss_set_num_of_threads(SEXP threadsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< unsigned int >::type threads(threadsSEXP);
+    rcpp_result_gen = Rcpp::wrap(set_num_of_threads(threads));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 RcppExport SEXP _rcpp_module_boot_master();
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_MJMrss_set_num_of_threads", (DL_FUNC) &_MJMrss_set_num_of_threads, 1},
     {"_rcpp_module_boot_master", (DL_FUNC) &_rcpp_module_boot_master, 0},
     {NULL, NULL, 0}
 };

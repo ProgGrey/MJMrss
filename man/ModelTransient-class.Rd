@@ -46,6 +46,8 @@ classes = matrix(c(1,# j
                    1,# p_j
                    1), # mu_j
                  nrow = 3, byrow = TRUE)
+# use 2 threads for computatuion
+set_num_of_threads(2)
 m = build_model(lambda, N, classes, f, P_a, P_d)
 trans = m$transient_analysis(10, -1)
 # At zero time in system 3 clients:

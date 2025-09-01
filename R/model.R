@@ -30,6 +30,8 @@
 #'                    0.5, 0.25, 0.15, 0.1,# p_j
 #'                    1,    1.9,  2.5, 3), # mu_j
 #'                    nrow = 3, byrow = TRUE)
+#' # use 2 threads for computatuion
+#' set_num_of_threads(2)
 #' m = build_model(lambda, N, classes, f, P_a, P_d)
 #' # mean customers in system and mean queue length:
 #' m$mean_clients
