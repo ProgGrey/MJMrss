@@ -4,8 +4,12 @@ Title: Multiserver Job Model with Random Speed Scaling
 Version: 1.0.4
 URL: https://github.com/ProgGrey/MJMrss
 BugReports: https://github.com/ProgGrey/MJMrss/issues
-Date: 2023-05-23
-Author: IAMR KarRC RAS
+Date: 2025-09-01
+Author:  Sergey Astafiev IAMR KarRC RAS
+Authors@R: c(person(given = "Sergey",
+                      family = "Astafiev",
+                      role = c("aut","cre"),
+                      email = "seryymail@mail.ru"))
 Maintainer: Sergey Astafiev <seryymail@mail.ru>
 Description: Numerical solution of multiserver job model with random speed scaling policy.
 License: BSD_3_clause + file LICENSE
@@ -14,3 +18,4 @@ Language: en-US
 Imports: methods, Rcpp (>= 1.0.9)
 LinkingTo: Rcpp, RcppEigen
 RoxygenNote: 7.2.1
+SystemRequirements: C++17
