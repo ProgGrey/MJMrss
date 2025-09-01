@@ -5,8 +5,8 @@ Version: 1.0.4
 URL: https://github.com/ProgGrey/MJMrss
 BugReports: https://github.com/ProgGrey/MJMrss/issues
 Date: 2025-09-01
-Author:  Sergey Astafiev IAMR KarRC RAS
-Authors@R: c(person(given = "Sergey",
+Authors@R: c(person("IAMR KarRC RAS", role = c("cph", "fnd")),
+             person(given = "Sergey",
                       family = "Astafiev",
                       role = c("aut","cre"),
                       email = "seryymail@mail.ru"))
